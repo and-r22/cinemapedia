@@ -31,7 +31,7 @@ class SearchedMoviesNotifier extends StateNotifier<List<Movie>> {
 
   Future<List<Movie>> searchMoviesByQuery( String query ) async{
     
-    final List<Movie> movies = await searchMovies(query);
+    final movies = await searchMovies(query);
     ref.read(searchQueryProvider.notifier).update((state) => query);
 
     state = movies;
