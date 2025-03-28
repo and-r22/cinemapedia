@@ -10,7 +10,6 @@ class CustomAppbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final colors = Theme.of(context).colorScheme;
     final titleStyle = Theme.of(context).textTheme.titleMedium;
 
@@ -45,12 +44,23 @@ class CustomAppbar extends ConsumerWidget {
                       context.push('/movie/${movie.id}');
                     });
 
-                  }, 
-                  icon: const Icon(Icons.search)
-                )
-              ],
-            ),
+                  showSearch<Movie?>(
+                    query: searchQuery,
+                    context: context,
+                    delegate: SearchMovieDelegate(
+                      initialMovies: searchedMovies,
+                      searchMovies: ref.read(searchedMoviesProvider.notifier).searchMoviesByQuery,
+                    ),
+                  ).then((movie) {
+                    if (movie == null || !context.mounted) return;
+                    context.push('/movie/${movie.id}');
+                  });
+                },
+                icon: const Icon(Icons.search),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }

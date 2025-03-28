@@ -35,7 +35,6 @@ class SearchMoviesNotifier extends StateNotifier<List<Movie>> {
 
     state = movies;
     return movies;
-
   }
 
 }
