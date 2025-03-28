@@ -11,29 +11,38 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   final SeachMoviesCallback searchMovies;
   List<Movie> initialMovies;
 
-  StreamController<List<Movie>> debounceMovies = StreamController.broadcast();
+  StreamController<List<Movie>> debouncedMovies = StreamController.broadcast();
   StreamController<bool> isLoadingStream = StreamController.broadcast();
 
   Timer? _debounceTimer;
 
-  SearchMovieDelegate({required this.searchMovies, required this.initialMovies})
-    : super(searchFieldLabel: 'Buscar películas');
+  SearchMovieDelegate({
+    required this.searchMovies,
+    required this.initialMovies,
+  }): super(
+    searchFieldLabel: 'Buscar película',
+    // textInputAction: TextInputAction.done
+  );
 
   void clearStreams() {
-    debounceMovies.close();
+    debouncedMovies.close();
   }
 
   void _onQueryChanged(String query) {
-    isLoadingStream.add(true);
 
+    isLoadingStream.add(true);
+    
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+
       final movies = await searchMovies(query);
       initialMovies = movies;
-      debounceMovies.add(movies);
+      debouncedMovies.add(movies);
       isLoadingStream.add(false);
+
     });
+
   }
 
   Widget buildResultsAndSuggestions() {
@@ -61,37 +70,57 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
-      FadeIn(
-        animate: query.isNotEmpty,
-        duration: const Duration(milliseconds: 200),
-        child: IconButton(
-          onPressed: () => query = '',
-          icon: const Icon(Icons.clear),
-        ),
+      StreamBuilder(
+        initialData: false,
+        stream: isLoadingStream.stream, 
+        builder: (context, snapshot) {
+          if(snapshot.data ?? true) {
+            return SpinPerfect(
+              duration: const Duration(seconds: 20),
+              spins: 10,
+              infinite: true,
+              child: const IconButton(
+                onPressed: null, 
+                icon: Icon(Icons.refresh_rounded)
+              ),
+            );
+          }
+
+          return FadeIn(
+            animate: query.isNotEmpty,
+            duration: const Duration(milliseconds: 200),
+            child: IconButton(
+              onPressed: () => query = '', 
+              icon: const Icon(Icons.clear)
+            ),
+          );
+
+        },
       ),
     ];
   }
 
   @override
   Widget? buildLeading(BuildContext context) {
-    return IconButton(
+    return IconButton( 
       onPressed: () {
         clearStreams();
         close(context, null);
       },
-      icon: const Icon(Icons.arrow_back_ios_new_outlined),
+      icon: const Icon(Icons.arrow_back)
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    return buildResultsAndSuggestions();
+    return _buildResultsAndSuggestions();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     _onQueryChanged(query);
-    return buildResultsAndSuggestions();
+
+    return _buildResultsAndSuggestions();
   }
 }
 

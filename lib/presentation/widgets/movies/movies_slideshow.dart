@@ -71,6 +71,7 @@ class _Slide extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               child: Image.network(
                 movie.backdropPath,
+                width: 500,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress != null) {
