@@ -9,7 +9,7 @@ class LocalStorageRepositoryImpl extends LocalStorageRepository {
   final LocalStorageDatasource datasource;
 
   @override
-  Future<void> isFavoriteMovie(int movieId) {
+  Future<bool> isFavoriteMovie(int movieId) {
     return datasource.isFavoriteMovie(movieId);
   }
 
