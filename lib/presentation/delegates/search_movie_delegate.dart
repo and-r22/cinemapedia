@@ -45,10 +45,10 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
 
   }
 
-  Widget buildResultsAndSuggestions() {
+  Widget _buildResultsAndSuggestions() {
     return StreamBuilder(
       initialData: initialMovies,
-      stream: debounceMovies.stream,
+      stream: debouncedMovies.stream,
       builder: (context, snapshot) {
         final movies = snapshot.data ?? [];
 
